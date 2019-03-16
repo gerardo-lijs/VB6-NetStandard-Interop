@@ -74,13 +74,16 @@ MsgBox ("Result from complex method is: " & oMathMethods.CalculateComplexMethod(
 
 * You can now extend your old VB6 application and keep your customer's and yourself happy writing as little as possible code in VB6 and avoiding Visual Studio 6 IDE
 
-![](VB6-Development-Win10/images/VB6Success.png)
+![](images/VB6Success.png)
 
 ### Step 5 - Deployment in client computers
 
-* Add tlb and dll files of your library to your installer. This dll will not register with regsvr32.exe your will need to use regasm.exe. Use 32 or 64bit version depending on your needs.
-
-
+* Add the NetStandard dll file of your library to your installer
+* No need to deploy tlb file
+* This dll will not register with regsvr32.exe your will need to use regasm.exe. Use 32 or 64bit version depending on your needs.
+* Register with /codebase argument
+* Unregister with /unregister argument
+* To locate regasm.exe in client computer you can find the related registry keys in HKLM\Software\Microsoft\.NetFramework. For example: C:\Windows\Microsoft.NET\Framework64\v4.0.30319 for 64bits or  C:\Windows\Microsoft.NET\Framework\v4.0.30319 for 32bits
 
 ### Extras
 ##### VB6 in Github
@@ -103,7 +106,7 @@ http://blog.danbrust.net/2015/09/14/installing-visual-basic-studio-6-on-windows-
 
 https://blogs.msdn.microsoft.com/luisdem/2018/12/03/how-to-install-visual-basic-6-0-on-windows-10/
 
-![](VB6-Development-Win10/images/VB6_in_Windows10_x64.png)
+![](images/VB6_in_Windows10_x64.png)
 
 ##### VB6 deployment in client computers using NSIS
 
