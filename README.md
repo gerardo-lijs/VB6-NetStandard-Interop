@@ -4,7 +4,7 @@ This sample shows how to call methods in a .NET Standard 2.0 class library from 
 ### Extras
 ##### VB6 in Github
 
-In order to use Github for your VB6 source code add this extensions to your Visual Studio .gitignore file like here: https://github.com/gerardo-lijs/VB6-NetStandard-Interop/blob/master/.gitignore
+In order to use Github for your VB6 source code add this extensions to your Visual Studio .gitignore file like this [.gitignore for VB6](.gitignore)
 
 ```markdown
 *.csi
