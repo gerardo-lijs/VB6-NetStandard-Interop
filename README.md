@@ -38,6 +38,49 @@ public class MathUtils : IMathUtils
 }
 ```
 
+* Compile library, generate tlb from assembly and register tlb and dll in development. Use Developer Command Prompt for Visual Studio as Administrator
+
+```dos
+regasm.exe /tlb /codebase NetStandardLibrary.dll
+```
+
+> Microsoft .NET Framework Assembly Registration Utility version 4.7.3190.0
+> for Microsoft .NET Framework version 4.7.3190.0
+> Copyright (C) Microsoft Corporation.  All rights reserved.
+> 
+> RegAsm : warning RA0000 : Registering an unsigned assembly with /codebase can cause your assembly to interfere with other applications that may be installed on the same computer. The /codebase switch is intended to be used only with signed assemblies. Please give your assembly a strong name and re-register it.
+> Types registered successfully
+> Assembly exported to '[Path]\NetStandardLibrary\bin\Release\netstandard2.0\NetStandardLibrary.tlb', and the type library was registered successfully
+> 
+
+### Step 2 - Add reference to library tlb from VB6
+
+* Open your VB6 application and browse NetStandardLibrary.tlb from Project -> References
+
+> This will add the reference to project .vbp file  
+> Reference=*\G{A1A932E1-98D8-38DE-81F5-6B67BC4AF161}#1.0#0#..\NetStandardLibrary\bin\Release\netstandard2.0\NetStandardLibrary.tlb#NetStandardLibrary
+> 
+
+### Step 3 - Run methods from library
+
+```vbnet
+Dim oMathMethods As IMathUtils
+Set oMathMethods = New NetStandardLibrary.MathUtils
+
+MsgBox ("Result from complex method is: " & oMathMethods.CalculateComplexMethod())
+```
+
+### Step 4 - Success
+
+* You can now extend your old VB6 application and keep your customer's and yourself happy writing as little as possible code in VB6 and avoiding Visual Studio 6 IDE
+
+![](VB6-Development-Win10/images/VB6Success.png)
+
+### Step 5 - Deployment in client computers
+
+* Add tlb and dll files of your library to your installer. This dll will not register with regsvr32.exe your will need to use regasm.exe. Use 32 or 64bit version depending on your needs.
+
+
 
 ### Extras
 ##### VB6 in Github
@@ -50,4 +93,64 @@ In order to use Github for your VB6 source code add this extensions to your Visu
 *.lib
 *.lvw
 *.dca
+```
+
+##### VB6 running on Windows 10 x64bits
+
+Here are a few links to help you setup VB6 in Windows 10.
+
+http://blog.danbrust.net/2015/09/14/installing-visual-basic-studio-6-on-windows-10
+
+https://blogs.msdn.microsoft.com/luisdem/2018/12/03/how-to-install-visual-basic-6-0-on-windows-10/
+
+![](VB6-Development-Win10/images/VB6_in_Windows10_x64.png)
+
+##### VB6 deployment in client computers using NSIS
+
+* If you use NSIS for your deployment this macros and functions will help you.
+
+```
+; Given a .NET version number, this function returns that .NET framework's
+; install directory. Returns "" if the given .NET version is not installed.
+; Params: [version] (eg. "v2.0")
+; Return: [dir] (eg. "C:\WINNT\Microsoft.NET\Framework\v2.0.50727")
+Function GetDotNetDir
+	Exch $R0 ; Set R0 to .net version major
+	Push $R1
+	Push $R2
+ 
+	; set R1 to minor version number of the installed .NET runtime
+	ClearErrors
+	EnumRegValue $R1 HKLM "Software\Microsoft\.NetFramework\policy\$R0" 0
+	IfErrors getdotnetdir_err
+ 
+	; set R2 to .NET install dir root
+	ReadRegStr $R2 HKLM "Software\Microsoft\.NetFramework" "InstallRoot"
+	IfErrors getdotnetdir_err
+ 
+	; set R0 to the .NET install dir full
+	StrCpy $R0 "$R2$R0.$R1"
+ 
+getdotnetdir_end:
+	Pop $R2
+	Pop $R1
+	Exch $R0 ; return .net install dir full
+	Return
+ 
+getdotnetdir_err:
+	StrCpy $R0 ""
+	Goto getdotnetdir_end
+FunctionEnd
+
+!macro RegAsm DllFileName
+; get directory of .NET framework installation
+	Push "v4.0"
+	Call GetDotNetDir
+	Pop $R0
+
+	; Perform our install
+	; e.g. use the .Net path in $R0 to call RegAsm.exe
+	;TODO: User nsExec to avoid black window
+	ExecWait '"$R0\RegAsm.exe" /codebase "${DllFileName}"'
+!macroend
 ```
